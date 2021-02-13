@@ -25,6 +25,7 @@ public class GUIController {
     }
 
     public void ready() {
+        App.getScene().getRoot().requestFocus();
         App.getScene().setOnKeyPressed(keyEvent -> {
             try {
                 if (keyEvent.getCode() == KeyCode.ENTER) get();
@@ -35,6 +36,9 @@ public class GUIController {
     @FXML
     void get() throws IOException {
         String url = urlField.getText();
+        if (url == null || url.isBlank())
+            return;
+
         JSONTokener response = new JSONTokener(new URL(url).openStream());
         jsonTree.setRoot(new TreeItem<>(url));
 

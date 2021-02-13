@@ -20,6 +20,7 @@ public class App extends Application {
 
         controller.ready();
         stage.setScene(scene);
+        stage.setTitle("JSONViewer");
         stage.setResizable(false);
         stage.show();
     }
