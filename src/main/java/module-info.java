@@ -5,4 +5,5 @@ module org.francescoborri.JSONViewer {
     requires javafx.fxml;
 
     opens org.francescoborri.JSONViewer to javafx.controls, javafx.fxml, javafx.graphics;
+    exports org.francescoborri.JSONViewer;
 }
