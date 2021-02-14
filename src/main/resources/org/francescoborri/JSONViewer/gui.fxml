@@ -25,12 +25,12 @@
         <VBox.margin>
             <Insets bottom="10.0" />
         </VBox.margin>
-        <TextField fx:id="urlField" promptText="Type or paste your JSON URL here" HBox.hgrow="ALWAYS">
+        <TextField fx:id="urlField" promptText="Enter a GET request URL here" HBox.hgrow="ALWAYS">
             <HBox.margin>
                 <Insets right="10.0" />
             </HBox.margin>
         </TextField>
-        <Button mnemonicParsing="false" onAction="#get" text="Go" />
+        <Button mnemonicParsing="false" onAction="#get" text="Send" />
     </HBox>
     <TreeView fx:id="jsonTree" />
 </VBox>
