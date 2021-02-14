@@ -6,10 +6,14 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.*;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.*;
 import java.util.Iterator;
 
 public class GUIController {
@@ -29,28 +33,44 @@ public class GUIController {
         App.getScene().setOnKeyPressed(keyEvent -> {
             try {
                 if (keyEvent.getCode() == KeyCode.ENTER) get();
-            } catch (IOException ignored) { }
+            } catch (IOException | URISyntaxException ignored) {
+            }
         });
     }
 
     @FXML
-    void get() throws IOException {
-        String url = urlField.getText();
-        if (url == null || url.isBlank())
+    void get() throws IOException, URISyntaxException {
+        String stringURL = urlField.getText();
+        if (stringURL == null || stringURL.isBlank())
             return;
 
-        JSONTokener response = new JSONTokener(new URL(url).openStream());
-        jsonTree.setRoot(new TreeItem<>(url));
+        URL url = new URL(stringURL.trim());
+        URI resource = new URI(
+                url.getProtocol(),
+                url.getUserInfo(),
+                url.getHost(),
+                url.getPort(),
+                url.getPath(),
+                url.getQuery(),
+                null
+        );
 
-        if (isJSONObject(response)) {
-            JSONObject json = new JSONObject(response);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(resource);
+        HttpResponse response = client.execute(request);
+
+        JSONTokener jsonTokener = new JSONTokener(response.getEntity().getContent());
+        jsonTree.setRoot(new TreeItem<>(resource.toASCIIString()));
+
+        if (isJSONObject(jsonTokener)) {
+            JSONObject json = new JSONObject(jsonTokener);
             json.keys().forEachRemaining((String jsonKey) -> load(jsonTree.getRoot(), jsonKey, json.get(jsonKey)));
-        } else if (isJSONArray(response)) {
-            Iterator<Object> iterator = new JSONArray(response).iterator();
+        } else if (isJSONArray(jsonTokener)) {
+            Iterator<Object> iterator = new JSONArray(jsonTokener).iterator();
             for (int i = 0; iterator.hasNext(); i++)
                 load(jsonTree.getRoot(), String.valueOf(i), iterator.next());
         } else
-            throw new JSONException(String.format("Invalid JSON response from URL %s", url));
+            throw new JSONException(String.format("Invalid JSON response from URL %s", resource.toASCIIString()));
     }
 
     private boolean isJSONObject(JSONTokener jsonTokener) {
