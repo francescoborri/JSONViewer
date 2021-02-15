@@ -52,7 +52,7 @@ public class GUIController {
                 url.getPort(),
                 url.getPath(),
                 url.getQuery(),
-                null
+                url.getRef()
         );
 
         HttpClient client = HttpClientBuilder.create().build();
